@@ -1,0 +1,405 @@
+
+
+
+ARM Macro Assembler    Page 1 
+
+
+    1 00000000         ; Exemplo.s
+    2 00000000         ; Desenvolvido para a placa EK-TM4C1294XL
+    3 00000000         ; Prof. Guilherme Peron
+    4 00000000         ; 12/03/2018
+    5 00000000         
+    6 00000000         ; ------------------------------------------------------
+                       -------------------------
+    7 00000000                 THUMB                        ; Instruções do tip
+                                                            o Thumb-2
+    8 00000000         ; ------------------------------------------------------
+                       -------------------------
+    9 00000000         ; Declarações EQU - Defines
+   10 00000000         ;<NOME>         EQU <VALOR>
+   11 00000000         
+   12 00000000         ; ------------------------------------------------------
+                       -------------------------
+   13 00000000         ; Área de Dados - Declarações de variáveis
+   14 00000000                 AREA             DATA, ALIGN=2
+   15 00000000         ; Se alguma variável for chamada em outro arquivo
+   16 00000000         ;EXPORT  <var> [DATA,SIZE=<tam>]   ; Permite chamar a va
+                       riável <var> a 
+   17 00000000         ; partir de outro arquivo
+   18 00000000         ;<var> SPACE <tam>                        ; Declara uma 
+                       variável de nome <var>
+   19 00000000         ; de <tam> bytes a partir da primeira 
+   20 00000000         ; posição da RAM  
+   21 00000000         ; ------------------------------------------------------
+                       -------------------------
+   22 00000000         ; Área de Código - Tudo abaixo da diretiva a seguir será
+                        armazenado na memória de 
+   23 00000000         ;                  código
+   24 00000000                 AREA             |.text|, CODE, READONLY, ALIGN=
+2
+   25 00000000         ;NUMEROS DCB  19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,
+                       3,2,1,0
+   26 00000000         ;NUMEROS  DCB  203,237,193,43,211,3,203,5,127,157,237,24
+                       1,19,0
+   27 00000000         ; Se alguma função do arquivo for chamada em outro arqui
+                       vo 
+   28 00000000                 EXPORT           Start       ; Permite chamar a 
+                                                            função Start a part
+                                                            ir de 
+   29 00000000         ; outro arquivo. No caso startup.s        
+   30 00000000         ; Se chamar alguma função externa 
+   31 00000000         ;IMPORT <func>              ; Permite chamar dentro dest
+                       e arquivo uma 
+   32 00000000         ; função <func>
+   33 00000000         
+   34 00000000         ; ------------------------------------------------------
+                       -------------------------
+   35 00000000         ; Função main()
+   36 00000000 20000000 
+                       INICIO_LISTA
+                               EQU              0x20000000
+   37 00000000 20000100 
+                       INICIO_LISTA_PRIMOS
+                               EQU              0x20000100
+   38 00000000         Start
+   39 00000000         ; Comece o código aqui <================================
+
+
+
+ARM Macro Assembler    Page 2 
+
+
+                       ======================
+   40 00000000 4827            LDR              R0, =NUMEROS ; R0 aponta para o
+                                                             início da lista de
+                                                            sordenada
+   41 00000002 F04F 5100       MOV              R1, #INICIO_LISTA ; R1 aponta p
+                                                            ara o endereço inic
+                                                            ial para armazenar 
+                                                            os primos
+   42 00000006 F04F 0300       MOV              R3, #0      ; R3 vai apontar pa
+                                                            ra o fim da lista d
+                                                            e numeros na RAM
+   43 0000000A F04F 0700       MOV              R7, #0      ; R7 vai apontar pa
+                                                            ra o fim da lista d
+                                                            e primos
+   44 0000000E         
+   45 0000000E         popular_ram
+   46 0000000E F810 2B01       LDRB             R2, [R0], #1 ; carrega um eleme
+                                                            nto da lista desord
+                                                            enada em R2 e itera
+                                                             o ponteiro da list
+                                                            a
+   47 00000012 2A00            CMP              R2, #0      ; compara o numero 
+                                                            que veio da lista d
+                                                            esordenada com zero
+                                                            
+   48 00000014 D003            BEQ              fim_popular_ram ; se R2 = 0, o 
+                                                            ultimo elemento, te
+                                                            rmina de popular a 
+                                                            RAM
+   49 00000016 460B            MOV              R3, R1      ; guarda o endereço
+                                                             do ultimo numero s
+                                                            alvo na RAM
+   50 00000018 F801 2B01       STRB             R2, [R1], #1 ; salva o numero d
+                                                            a lista desordenada
+                                                             numa posição da RA
+                                                            M e itera o ponteir
+                                                            o da RAM
+   51 0000001C E7F7            B                popular_ram
+   52 0000001E         
+   53 0000001E         fim_popular_ram
+   54 0000001E F04F 5000       MOV              R0, #INICIO_LISTA ; R0 guarda a
+                                                             posição inicial do
+                                                            s numeros na RAM
+   55 00000022         ;MOV R1, #INICIO_LISTA_PRIMOS ; R1 guarda a posição inic
+                       ial dos numeros primos que serão salvos
+   56 00000022 F500 7180       ADD              R1, R0, #0x100 ; R1 guarda a po
+                                                            sição inicial dos n
+                                                            umeros primos que s
+                                                            erão salvos
+   57 00000026 2B00            CMP              R3, #0      ; se R3 for zero, n
+                                                            enhum numero foi co
+                                                            locado na lista ini
+                                                            cial na RAM
+   58 00000028 D02D            BEQ              fim
+   59 0000002A         
+   60 0000002A         filtrar_primos
+   61 0000002A 4298            CMP              R0, R3      ; se R0, que aponta
+                                                             para a fila for ma
+                                                            ior que R3, que é o
+
+
+
+ARM Macro Assembler    Page 3 
+
+
+                                                             fim da fila, vai p
+                                                            ara o sort
+   62 0000002C D815            BHI              fim_filtrar_primos
+   63 0000002E F810 2B01       LDRB             R2, [R0], #1 ; coloca em R2 o p
+                                                            rimeiro elemento da
+                                                             lista de numeros e
+                                                             itera o ponteiro
+   64 00000032 2A02            CMP              R2, #2      ; se o numero for <
+                                                            = 2, não é primo, e
+                                                            scolher o próximo
+   65 00000034 D9F9            BLS              filtrar_primos
+   66 00000036 F04F 0502       MOV              R5, #2      ; R5 vai ser usado 
+                                                            para dividir o cand
+                                                            idato a primo, até 
+                                                            R5 ser maior que R4
+                                                            /2
+   67 0000003A FBB2 F4F5       UDIV             R4, R2, R5  ; R4 guarda metade 
+                                                            do numero que vai s
+                                                            er checado se é pri
+                                                            mo
+   68 0000003E         
+   69 0000003E         checar_primo
+   70 0000003E FBB2 F6F5       UDIV             R6, R2, R5
+   71 00000042 FB06 2615       MLS              R6, R6, R5, R2 ; R6 guarda o re
+                                                            sto da divisão do c
+                                                            andidato a primo (R
+                                                            2) por R5
+   72 00000046 2E00            CMP              R6, #0
+   73 00000048 D0EF            BEQ              filtrar_primos ; se o resto da 
+                                                            divisão por R5 for 
+                                                            zero, não é primo
+   74 0000004A F105 0501       ADD              R5, R5, #1  ; itera R5 até R5 >
+                                                             R4
+   75 0000004E 42AC            CMP              R4, R5
+   76 00000050 D8F5            BHI              checar_primo
+   77 00000052 460F            MOV              R7, R1      ; guarda o endereço
+                                                             do ultimo primo ar
+                                                            mazenado na lista d
+                                                            e primos
+   78 00000054 F801 2B01       STRB             R2, [R1], #1 ; se R2 não é divi
+                                                            sível por qualquer 
+                                                            numero entre 2 e R2
+                                                            /2, ele é primo
+   79 00000058 E7E7            B                filtrar_primos
+   80 0000005A         
+   81 0000005A         fim_filtrar_primos
+   82 0000005A         ;MOV R0, #INICIO_LISTA_PRIMOS ; R0 guarda a posição inic
+                       ial da lista de primos
+   83 0000005A F04F 5000       MOV              R0, #INICIO_LISTA ; R0 guarda a
+                                                             posição inicial da
+                                                             lista de primos
+   84 0000005E F500 7080       ADD              R0, R0, #0x100
+   85 00000062 4601            MOV              R1, R0      ; R1 vai guardar um
+                                                            a referência para o
+                                                             início da lista de
+                                                             primos
+   86 00000064         
+   87 00000064         bubble_sort
+   88 00000064 42B8            CMP              R0, R7      ; compara se R7 já 
+
+
+
+ARM Macro Assembler    Page 4 
+
+
+                                                            chegou no começo da
+                                                             lista
+   89 00000066 D00E            BEQ              fim
+   90 00000068 4602            MOV              R2, R0      ; guarda uma referê
+                                                            ncia para o primeir
+                                                            o elemento da compa
+                                                            ração
+   91 0000006A F810 3B01       LDRB             R3, [R0], #1 ; pega um elemento
+                                                             da lista de primos
+                                                             e itera o ponteiro
+                                                            
+   92 0000006E 7804            LDRB             R4, [R0]    ; pega o proximo el
+                                                            emento sem iterar
+   93 00000070         
+   94 00000070 42A3            CMP              R3, R4
+   95 00000072         
+   96 00000072 BF86            ITTE             HI          ; se R3 for maior q
+                                                            ue R4:
+   97 00000074 7003            STRBHI           R3, [R0]    ; troca a posição d
+                                                            e R3 e R4, os dois 
+                                                            elementos da compar
+                                                            ação do bubble sort
+                                                            
+   98 00000076 7014            STRBHI           R4, [R2]
+   99 00000078 BF00            NOPLS
+  100 0000007A         
+  101 0000007A 42B8            CMP              R0, R7      ; checa se R0 já ch
+                                                            egou no fim da fila
+                                                             de primos
+  102 0000007C         
+  103 0000007C BF06            ITTE             EQ          ; se R0 chegou no f
+                                                            im da fila:
+  104 0000007E 4608            MOVEQ            R0, R1      ; reseta o início d
+                                                            a fila
+  105 00000080 1E7F            SUBEQ            R7, R7, #1  ; remove um índice 
+                                                            do ponteiro do fim 
+                                                            da fila
+  106 00000082 BF00            NOPNE
+  107 00000084 E7EE            B                bubble_sort
+  108 00000086         
+  109 00000086         fim
+  110 00000086 BF00            NOP
+  111 00000088 C1 3F B0 
+              7F 2B 13 
+              D3 03 CB 
+              05 15 7F 
+              CE F5 9D 
+              ED F1 69 
+              FC 13 00 NUMEROS DCB              193,63,176,127,43,19,211,3,203,
+5,21,127,206,245,157,237,241,105,252,19,0
+  112 0000009D         
+  113 0000009D 00 00 00        ALIGN                        ; garante que o fim
+                                                             da seção está alin
+                                                            hada 
+  114 000000A0                 END                          ; fim do arquivo
+              00000000 
+Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M4.fp.sp --apcs=
+interwork --depend=.\exemplo.d -o.\exemplo.o -IC:\Users\moise\AppData\Local\Arm
+\Packs\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C129 -ID:\KEIL\ARM\CMSIS\Include -
+
+
+
+ARM Macro Assembler    Page 5 
+
+
+-predefine="__EVAL SETA 1" --predefine="__UVISION_VERSION SETA 531" --predefine
+="TM4C1294NCPDT SETA 1" --list=.\exemplo.lst exemplo.s
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+DATA 00000000
+
+Symbol: DATA
+   Definitions
+      At line 14 in file exemplo.s
+   Uses
+      None
+Comment: DATA unused
+1 symbol
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+.text 00000000
+
+Symbol: .text
+   Definitions
+      At line 24 in file exemplo.s
+   Uses
+      None
+Comment: .text unused
+NUMEROS 00000088
+
+Symbol: NUMEROS
+   Definitions
+      At line 111 in file exemplo.s
+   Uses
+      At line 40 in file exemplo.s
+Comment: NUMEROS used once
+Start 00000000
+
+Symbol: Start
+   Definitions
+      At line 38 in file exemplo.s
+   Uses
+      At line 28 in file exemplo.s
+Comment: Start used once
+bubble_sort 00000064
+
+Symbol: bubble_sort
+   Definitions
+      At line 87 in file exemplo.s
+   Uses
+      At line 107 in file exemplo.s
+Comment: bubble_sort used once
+checar_primo 0000003E
+
+Symbol: checar_primo
+   Definitions
+      At line 69 in file exemplo.s
+   Uses
+      At line 76 in file exemplo.s
+Comment: checar_primo used once
+filtrar_primos 0000002A
+
+Symbol: filtrar_primos
+   Definitions
+      At line 60 in file exemplo.s
+   Uses
+      At line 65 in file exemplo.s
+      At line 73 in file exemplo.s
+      At line 79 in file exemplo.s
+
+fim 00000086
+
+Symbol: fim
+   Definitions
+      At line 109 in file exemplo.s
+   Uses
+      At line 58 in file exemplo.s
+      At line 89 in file exemplo.s
+
+
+
+
+ARM Macro Assembler    Page 2 Alphabetic symbol ordering
+Relocatable symbols
+
+fim_filtrar_primos 0000005A
+
+Symbol: fim_filtrar_primos
+   Definitions
+      At line 81 in file exemplo.s
+   Uses
+      At line 62 in file exemplo.s
+Comment: fim_filtrar_primos used once
+fim_popular_ram 0000001E
+
+Symbol: fim_popular_ram
+   Definitions
+      At line 53 in file exemplo.s
+   Uses
+      At line 48 in file exemplo.s
+Comment: fim_popular_ram used once
+popular_ram 0000000E
+
+Symbol: popular_ram
+   Definitions
+      At line 45 in file exemplo.s
+   Uses
+      At line 51 in file exemplo.s
+Comment: popular_ram used once
+10 symbols
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Absolute symbols
+
+INICIO_LISTA 20000000
+
+Symbol: INICIO_LISTA
+   Definitions
+      At line 36 in file exemplo.s
+   Uses
+      At line 41 in file exemplo.s
+      At line 54 in file exemplo.s
+      At line 83 in file exemplo.s
+
+INICIO_LISTA_PRIMOS 20000100
+
+Symbol: INICIO_LISTA_PRIMOS
+   Definitions
+      At line 37 in file exemplo.s
+   Uses
+      None
+Comment: INICIO_LISTA_PRIMOS unused
+2 symbols
+349 symbols in table

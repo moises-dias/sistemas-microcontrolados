@@ -1,0 +1,1 @@
+.\exemplo.o: exemplo.s
