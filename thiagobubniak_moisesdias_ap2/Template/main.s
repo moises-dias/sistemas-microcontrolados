@@ -40,7 +40,7 @@
 									; função <func>
 		IMPORT  PLL_Init
 		IMPORT  SysTick_Init
-		IMPORT  SysTick_Wait1ms			
+		IMPORT  SysTick_Wait			
 		IMPORT  GPIO_Init
 		IMPORT 	PortJ_Input
 		IMPORT 	Port_Output
@@ -73,7 +73,7 @@ MainLoop
 
 	MOV R0, R8
 	PUSH {LR}
-	BL SysTick_Wait1ms
+	BL SysTick_Wait
 	POP {LR}
 	BL checar_inputs
 	BL acender_leds
