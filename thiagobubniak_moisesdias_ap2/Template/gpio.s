@@ -59,16 +59,8 @@ GPIO_PORTF               	EQU    2_000000000100000
         EXPORT GPIO_Init            ; Permite chamar GPIO_Init de outro arquivo
 		EXPORT PortJ_Input
 		EXPORT Port_Output
-		; ****************************************
-		; Exportar as funções usadas em outros arquivos
-		; ****************************************
 									
 GPIO_Init
-;=====================
-; ****************************************
-; Escrever função de inicialização dos GPIO
-; Inicializar as portas J e N
-; ****************************************
 ; 1. Ativar o clock para a porta setando o bit correspondente no registrador RCGCGPIO,
 ; após isso verificar no PRGPIO se a porta está pronta para uso.
 ; enable clock to GPIOF at clock gating register
@@ -90,8 +82,8 @@ EsperaGPIO  LDR     R1, [R0]						;Lê da memória o conteúdo do endereço do regis
             MOV     R1, #0x00						;Colocar 0 no registrador para desabilitar a função analógica
             LDR     R0, =GPIO_PORTJ_AHB_AMSEL_R     ;Carrega o R0 com o endereço do AMSEL para a porta J
             STR     R1, [R0]						;Guarda no registrador AMSEL da porta J da memória
-            LDR     R0, =GPIO_PORTN_AHB_AMSEL_R		;Carrega o R0 com o endereço do AMSEL para a porta F
-            STR     R1, [R0]					    ;Guarda no registrador AMSEL da porta F da memória
+            LDR     R0, =GPIO_PORTN_AHB_AMSEL_R		;Carrega o R0 com o endereço do AMSEL para a porta N
+            STR     R1, [R0]					    ;Guarda no registrador AMSEL da porta N da memória
 			LDR     R0, =GPIO_PORTF_AHB_AMSEL_R		;Carrega o R0 com o endereço do AMSEL para a porta F
             STR     R1, [R0]					    ;Guarda no registrador AMSEL da porta F da memória
  
@@ -101,10 +93,10 @@ EsperaGPIO  LDR     R1, [R0]						;Lê da memória o conteúdo do endereço do regis
             STR     R1, [R0]                        ;Guarda no registrador PCTL da porta J da memória
             LDR     R0, =GPIO_PORTN_AHB_PCTL_R      ;Carrega o R0 com o endereço do PCTL para a porta N
             STR     R1, [R0]                        ;Guarda no registrador PCTL da porta N da memória
-			LDR     R0, =GPIO_PORTF_AHB_PCTL_R      ;Carrega o R0 com o endereço do PCTL para a porta N
-            STR     R1, [R0]                        ;Guarda no registrador PCTL da porta N da memória
+			LDR     R0, =GPIO_PORTF_AHB_PCTL_R      ;Carrega o R0 com o endereço do PCTL para a porta F
+            STR     R1, [R0]                        ;Guarda no registrador PCTL da porta F da memória
 ; 4. DIR para 0 se for entrada, 1 se for saída
-            LDR     R0, =GPIO_PORTN_AHB_DIR_R		;Carrega o R0 com o endereço do DIR para a porta F
+            LDR     R0, =GPIO_PORTN_AHB_DIR_R		;Carrega o R0 com o endereço do DIR para a porta N
 			MOV     R1, #2_00000011					;PN1 & PN0 para LED
             STR     R1, [R0]						;Guarda no registrador
 			LDR     R0, =GPIO_PORTF_AHB_DIR_R		;Carrega o R0 com o endereço do DIR para a porta F
@@ -121,14 +113,14 @@ EsperaGPIO  LDR     R1, [R0]						;Lê da memória o conteúdo do endereço do regis
             STR     R1, [R0]						;Escreve na porta
             LDR     R0, =GPIO_PORTJ_AHB_AFSEL_R     ;Carrega o endereço do AFSEL da porta J
             STR     R1, [R0]                        ;Escreve na porta
-			LDR     R0, =GPIO_PORTF_AHB_AFSEL_R     ;Carrega o endereço do AFSEL da porta J
+			LDR     R0, =GPIO_PORTF_AHB_AFSEL_R     ;Carrega o endereço do AFSEL da porta F
             STR     R1, [R0]                        ;Escreve na porta
 ; 6. Setar os bits de DEN para habilitar I/O digital
             LDR     R0, =GPIO_PORTN_AHB_DEN_R			;Carrega o endereço do DEN
             MOV     R1, #2_00000011                     ;Ativa os pinos PN0 e PN1 como I/O Digital
             STR     R1, [R0]							;Escreve no registrador da memória funcionalidade digital 
 			LDR     R0, =GPIO_PORTF_AHB_DEN_R			;Carrega o endereço do DEN
-            MOV     R1, #2_00010001                     ;Ativa os pinos PN0 e PN1 como I/O Digital
+            MOV     R1, #2_00010001                     ;Ativa os pinos PF0 e PF4 como I/O Digital
             STR     R1, [R0]							;Escreve no registrador da memória funcionalidade digital 
  
             LDR     R0, =GPIO_PORTJ_AHB_DEN_R			;Carrega o endereço do DEN
@@ -146,25 +138,19 @@ EsperaGPIO  LDR     R1, [R0]						;Lê da memória o conteúdo do endereço do regis
 
 
 Port_Output
-; ****************************************
-; Escrever função que acende ou apaga o LED
-; ****************************************
 	LDR	R1, =GPIO_PORTN_AHB_DATA_R		    ;Carrega o valor do offset do data register
 	;Read-Modify-Write para escrita
 	LDR R2, [R1]
-	BIC R2, #2_00000011                     ;Primeiro limpamos os dois bits do lido da porta R2 = R2 & 11101110
-	ORR R3, R2, R0, LSR #2                          ;Fazer o OR do lido pela porta com o parâmetro de entrada
-	STR R3, [R1]                            ;Escreve na porta F o barramento de dados dos pinos F4 e F0
+	BIC R2, #2_00000011                     ;Primeiro limpamos os dois bits do lido da porta R2 = R2 & 11111100
+	ORR R3, R2, R0, LSR #2                  ;os dois bits menos significativos de R0 são referentes a port F e não são usados aqui
+	STR R3, [R1]                            
 
-; ****************************************
-; Escrever função que acende ou apaga o LED
-; ****************************************
 	LDR	R1, =GPIO_PORTF_AHB_DATA_R		    ;Carrega o valor do offset do data register
 	;Read-Modify-Write para escrita
 	LDR R2, [R1]
 	BIC R2, #2_00010001                     ;Primeiro limpamos os dois bits do lido da porta R2 = R2 & 11101110
 	
-	ORR R0, R0, R0, LSL #3
+	ORR R0, R0, R0, LSL #3					;colocamos os dois bits menos significativos de R0 nas posições corretas para salvar em F4 e F0
 	AND R0, R0, #2_00010001
 	
 	ORR R3, R0, R2                          ;Fazer o OR do lido pela porta com o parâmetro de entrada
@@ -177,19 +163,9 @@ Port_Output
 ; Parâmetro de entrada: Não tem
 ; Parâmetro de saída: R0 --> o valor da leitura
 PortJ_Input
-; ****************************************
-; Escrever função que lê a chave e retorna 
-; um registrador se está ativada ou não
-; ****************************************
 	LDR	R1, =GPIO_PORTJ_AHB_DATA_R		    ;Carrega o valor do offset do data register
 	LDR R0, [R1]                            ;Lê no barramento de dados dos pinos [J1-J0]
 	BX LR
-
-
-
-
-
-
 
     ALIGN                           ; garante que o fim da seção está alinhada 
     END                             ; fim do arquivo

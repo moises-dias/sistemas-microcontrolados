@@ -42,8 +42,8 @@
 		IMPORT  SysTick_Init
 		IMPORT  SysTick_Wait1ms			
 		IMPORT  GPIO_Init
-		IMPORT PortJ_Input
-		IMPORT Port_Output
+		IMPORT 	PortJ_Input
+		IMPORT 	Port_Output
 		; ****************************************
 		; Importar as funções declaradas em outros arquivos
 		; ****************************************
@@ -59,11 +59,11 @@ Start
 ; Fazer as demais inicializações aqui.
 ; ****************************************
 	
-	;INICIANDO VARIAVEIS PASSEIO DO CAVALEIRO
-	MOV R4, #2_00001000 	;estado inicial
-	MOV R5, #0				;direção: 0=direita, 1=esquerda
-	MOV R6, #0				;guarda o tipo da execução 0=cavaleiro, 1=contagem
-	MOV R7, #0				;registrador do conta binária
+	;INICALIZANDO VARIAVEIS
+	MOV R4, #2_00001000 	;estado inicial passeio do caveleiro
+	MOV R5, #0				;direção passeio do caveleiro: 0=direita, 1=esquerda
+	MOV R6, #0				;guarda o tipo da execução 0=cavaleiro, 1=contador
+	MOV R7, #0				;registrador do contador
 	MOV R8, #1000			;velocidade inicial
 	
 MainLoop
@@ -84,60 +84,32 @@ checar_inputs
 	PUSH {LR}
 	BL PortJ_Input
 	POP {LR}
-	;checa se muda o tipo de execução
-	ANDS R1, R0, #2_00000001
+	ANDS R1, R0, #2_00000001	;checa se o botão para mudar o tipo de execução foi pressionado
 	IT EQ
-	EOREQ R6, R6, #1
+	EOREQ R6, R6, #1			;muda o tipo de execução
 	
-	;mudar velociddade
-	ANDS R1, R0, #2_00000010
-	BNE fim
+	ANDS R1, R0, #2_00000010	;checa se o botão para mudar a velocidade foi pressionado
+	BNE fim_checar_inputs
 	
-	CMP R8, #1000
+	CMP R8, #1000				;ajusta a velocidade dependendo da velocidade atual
 	ITT EQ
 	MOVEQ R8, #500
-	BEQ fim
+	BEQ fim_checar_inputs
 	
 	CMP R8, #500
 	ITT EQ
 	MOVEQ R8, #200
-	BEQ fim
+	BEQ fim_checar_inputs
 	
 	CMP R8, #200
 	IT EQ
 	MOVEQ R8, #1000
 
-fim
+fim_checar_inputs
 	BX LR
 	
 	
 acender_leds
-	CMP R6, #1					;Checa se é conta binária e vai para branch conta_binária
-	BEQ conta_binaria
-
-	;R5=DIREÇÃO, R4=ESTADO CAVALEIRO
-	CMP R5, #0
-	ITE EQ
-	LSREQ R4, #1
-	LSLNE R4, #1
-
-	CMP R4, #2_00000001		;SE O CAVELEIRO ESTIVER NO EXTREMO DA DIREITA MUDA A DIREÇÃO PARA A ESQUERDA
-	IT EQ
-	MOVEQ R5, #1
-
-	CMP R4, #2_00001000	;SE O CAVALEIRO ESTIVER NO EXTREMO DA ESQUERDA MUDA A DIREÇÃO PARA A DIREITA		
-	IT EQ
-	MOVEQ R5, #0
-	B leds
-	
-	
-conta_binaria	
-	ADD R7, #1
-	CMP R7, #16
-	IT EQ
-	MOVEQ R7, #0
-	
-leds
 	CMP R6, #0					;checa se o tipo da execução é passo cavaleiro
 	ITE EQ
 	MOVEQ R0, R4
@@ -146,6 +118,33 @@ leds
 	PUSH {LR}
 	BL Port_Output
 	POP {LR}
+
+	CMP R6, #1					;Checa se o modo de execução é o contador e vai para branch conta_binária
+	BEQ conta_binaria
+
+	;lógica do passeio do cavaleiro
+	CMP R5, #0
+	ITE EQ
+	LSREQ R4, #1
+	LSLNE R4, #1
+
+	CMP R4, #2_00000001			;se o cavaleiro estiver no limite da direita muda a direção
+	IT EQ
+	MOVEQ R5, #1
+
+	CMP R4, #2_00001000			;se o cavaleiro estiver no limite da esquerda muda a direção		
+	IT EQ
+	MOVEQ R5, #0
+	B fim_acender_leds
+	
+	
+conta_binaria					;lógica do contador
+	ADD R7, #1
+	CMP R7, #16
+	IT EQ
+	MOVEQ R7, #0
+	
+fim_acender_leds
 	
 	BX LR
 
