@@ -236,6 +236,7 @@ NVIC_ST_RELOAD_R      EQU 0xE000E014
 NVIC_ST_CURRENT_R     EQU 0xE000E018
 ; -------------------------------------------------------------------------------------------------------------------------	
         EXPORT  SysTick_Init
+		EXPORT  SysTick_Wait1ms
 		EXPORT  SysTick_Wait
 ;------------SysTick_Init------------
 ; Configura o sistema para utilizar o SysTick para delays
@@ -256,7 +257,24 @@ SysTick_Init
 	MOV R0, #0x05					; ENABLE | CLK_SRC
 	STR R0, [R1] 					; Seta os bits de ENABLE e CLK_SRC na memória
 	BX LR
-	
+
+;------------SysTick_Wait------------
+; Atraso de tempo utilizando processador ocupado
+; Entrada: R0 -> parâmetro de delay em unidades do clock do core (12.5ns)
+; Saída: Nenhum
+; Modifica: R0
+SysTick_Wait
+	PUSH {R1, R3}						; Salva os valores de R1 e R3 externos
+	LDR R1, =NVIC_ST_RELOAD_R 			; R1 = &NVIC_ST_RELOAD_RSUB R0 (ponteiro)
+	SUB R0, #1                          
+	STR R0, [R1] 						; delay-1, número de contagens para esperar
+	LDR R1, =NVIC_ST_CTRL_R 			; R1 = &NVIC_ST_CTRL_R
+SysTick_Wait_loop
+	LDR R3, [R1] 						; R3 = &NVIC_ST_CTRL_R (ponteiro)
+	ANDS R3, R3, #0x00010000 			; O bit COUNT está setado? (Bit 16)
+	BEQ SysTick_Wait_loop               ; Se sim permanece no loop
+	POP {R1, R3}						; Restaura
+	BX LR                               ; Se não, retorna
 
 ;------------SysTick_Wait1ms------------
 ; tempo de atraso usando processador ocupado. Assume um clock de 80 MHz
@@ -266,7 +284,7 @@ SysTick_Init
 DELAY1MS EQU 80000 ; número de ciclos de clock para contar 1ms (assumindo 80 MHz)
 	               ; 80000 x 12,5 ns = 1 ms
 
-SysTick_Wait
+SysTick_Wait1ms
 	PUSH {R4, LR} 						; salva o valor atual de R4 e Link Register
 	MOVS R4, R0 						; R4 = R0  numEsperasRestantes com atualização dos flags
 	BEQ SysTick_Wait1ms_done 			; Se o numEsperasRestantes == 0, vai para o fim

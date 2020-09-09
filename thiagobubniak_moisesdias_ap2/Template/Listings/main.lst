@@ -59,7 +59,7 @@ ARM Macro Assembler    Page 1
    40 00000000         ; função <func>
    41 00000000                 IMPORT           PLL_Init
    42 00000000                 IMPORT           SysTick_Init
-   43 00000000                 IMPORT           SysTick_Wait
+   43 00000000                 IMPORT           SysTick_Wait1ms
    44 00000000                 IMPORT           GPIO_Init
    45 00000000                 IMPORT           PortJ_Input
    46 00000000                 IMPORT           Port_Output
@@ -114,7 +114,7 @@ ARM Macro Assembler    Page 2
    73 00000020         
    74 00000020 4640            MOV              R0, R8
    75 00000022 B500            PUSH             {LR}
-   76 00000024 F7FF FFFE       BL               SysTick_Wait
+   76 00000024 F7FF FFFE       BL               SysTick_Wait1ms
    77 00000028 F85D EB04       POP              {LR}
    78 0000002C F000 F803       BL               checar_inputs
    79 00000030 F000 F820       BL               acender_leds
@@ -235,10 +235,10 @@ ARM Macro Assembler    Page 4
                                                             ada 
   156 000000AC                 END                          ;Fim do arquivo
 Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M4.fp.sp --apcs=
-interwork --depend=.\objects\main.d -o.\objects\main.o -IC:\Users\Thiago\AppDat
-a\Local\Arm\Packs\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C129 -IC:\Keil_v5\ARM\C
-MSIS\Include --predefine="__EVAL SETA 1" --predefine="__UVISION_VERSION SETA 53
-1" --predefine="TM4C1294NCPDT SETA 1" --list=.\listings\main.lst main.s
+interwork --depend=.\objects\main.d -o.\objects\main.o -IC:\Users\moise\AppData
+\Local\Arm\Packs\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C129 -ID:\KEIL\ARM\CMSIS
+\Include --predefine="__EVAL SETA 1" --predefine="__UVISION_VERSION SETA 531" -
+-predefine="TM4C1294NCPDT SETA 1" --list=.\listings\main.lst main.s
 
 
 
@@ -379,13 +379,13 @@ Symbol: SysTick_Init
    Uses
       At line 56 in file main.s
 Comment: SysTick_Init used once
-SysTick_Wait 00000000
+SysTick_Wait1ms 00000000
 
-Symbol: SysTick_Wait
+Symbol: SysTick_Wait1ms
    Definitions
       At line 43 in file main.s
    Uses
       At line 76 in file main.s
-Comment: SysTick_Wait used once
+Comment: SysTick_Wait1ms used once
 6 symbols
 349 symbols in table
