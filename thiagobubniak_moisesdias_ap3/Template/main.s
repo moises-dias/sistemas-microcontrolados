@@ -59,63 +59,13 @@ Start
 ; ****************************************
 ; Fazer as demais inicializações aqui.
 ; ****************************************
-	
-	;INICALIZANDO VARIAVEIS
-	MOV R4, #2_00001000 	;estado inicial passeio do caveleiro
-	MOV R5, #0				;direção passeio do caveleiro: 0=direita, 1=esquerda
-	MOV R6, #0				;guarda o tipo da execução 0=cavaleiro, 1=contador
-	MOV R7, #0				;registrador do contador
-	MOV R8, #1000			;velocidade inicial
-	
+
 MainLoop
 ; ****************************************
 ; Escrever código o loop principal aqui. 
 ; ****************************************
 
-	
 	B MainLoop
-	
-
-	
-	
-acender_leds
-	CMP R6, #0					;checa se o tipo da execução é passo cavaleiro
-	ITE EQ
-	MOVEQ R0, R4
-	MOVNE R0, R7
-	
-	PUSH {LR}
-	BL Port_Output
-	POP {LR}
-
-	CMP R6, #1					;Checa se o modo de execução é o contador e vai para branch conta_binária
-	BEQ conta_binaria
-
-	;lógica do passeio do cavaleiro
-	CMP R5, #0
-	ITE EQ
-	LSREQ R4, #1
-	LSLNE R4, #1
-
-	CMP R4, #2_00000001			;se o cavaleiro estiver no limite da direita muda a direção
-	IT EQ
-	MOVEQ R5, #1
-
-	CMP R4, #2_00001000			;se o cavaleiro estiver no limite da esquerda muda a direção		
-	IT EQ
-	MOVEQ R5, #0
-	B fim_acender_leds
-	
-	
-conta_binaria					;lógica do contador
-	ADD R7, #1
-	CMP R7, #16
-	IT EQ
-	MOVEQ R7, #0
-	
-fim_acender_leds
-	
-	BX LR
 
 
 ; -------------------------------------------------------------------------------------------------------------------------
