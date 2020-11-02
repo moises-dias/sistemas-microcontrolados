@@ -96,10 +96,31 @@ ARM Macro Assembler    Page 2
    55 0000005C         
    56 0000005C 4770            BX               LR
    57 0000005E         
-   58 0000005E 00 00           ALIGN                        ;Garante que o fim 
+   58 0000005E         ;GPIOPortJ_Handler
+   59 0000005E         ;   
+   60 0000005E         ;  LDR R0, =0x40060414     ; LENDO GPIORIS - GPIO_PORTJ_
+                       AHB_RIS_R
+   61 0000005E         ;  LDR R1, [R0]
+   62 0000005E         ;  ANDS R0, R1, #2_001     ; LENDO SE A PORTA J0 TEVE IN
+                       TERRUPT, SE NÃO, DA BRANCH
+   63 0000005E         ;  
+   64 0000005E         ;  PUSH{LR}
+   65 0000005E         ;  BL Port_Output
+   66 0000005E         ;  POP{LR}
+   67 0000005E         ;  
+   68 0000005E         ;  LDR R0, =0x4006041C     ; LIMPANDO INTERRUPTS DAS POR
+                       TAS J0 E J1 - GPIO_PORTJ_AHB_ICR_R
+   69 0000005E         ;  LDR R1, [R0]
+   70 0000005E         ;  ORR R1, R1, #2_11
+   71 0000005E         ;  MOV R1, #2_11
+   72 0000005E         ;  STR R1, [R0]
+   73 0000005E         ;  
+   74 0000005E         ;  BX LR
+   75 0000005E         ;  
+   76 0000005E 00 00           ALIGN                        ;Garante que o fim 
                                                             da seção está alinh
                                                             ada 
-   59 00000060                 END                          ;Fim do arquivo
+   77 00000060                 END                          ;Fim do arquivo
               40060410 
               40060404 
               40060408 
@@ -107,12 +128,18 @@ ARM Macro Assembler    Page 2
               4006041C 
               E000E104 
               E000E430 
+
+
+
+ARM Macro Assembler    Page 3 
+
+
 Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M4.fp.sp --apcs=
 interwork --depend=.\objects\interruptinit.d -o.\objects\interruptinit.o -IC:\U
-sers\Thiago\AppData\Local\Arm\Packs\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C129 
--IC:\Keil_v5\ARM\CMSIS\Include --predefine="__EVAL SETA 1" --predefine="__UVISI
-ON_VERSION SETA 531" --predefine="TM4C1294NCPDT SETA 1" --list=.\listings\inter
-ruptinit.lst InterruptInit.s
+sers\moise\AppData\Local\Arm\Packs\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C129 -
+ID:\KEIL\ARM\CMSIS\Include --predefine="__EVAL SETA 1" --predefine="__UVISION_V
+ERSION SETA 531" --predefine="TM4C1294NCPDT SETA 1" --list=.\listings\interrupt
+init.lst InterruptInit.s
 
 
 

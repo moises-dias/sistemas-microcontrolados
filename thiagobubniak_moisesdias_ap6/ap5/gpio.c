@@ -55,13 +55,22 @@ void GPIO_Init(void)
 
 }	
 
+// -------------------------------------------------------------------------------
+// Função PortJ_Input
+// Lê os valores de entrada do port J
+// Parâmetro de entrada: Não tem
+// Parâmetro de saída: o valor da leitura do port
+uint32_t PortJ_Input(void)
+{
+	return GPIO_PORTJ_AHB_DATA_R;
+}
 
 // -------------------------------------------------------------------------------
 // Função PortN_Output
 // Escreve os valores no port N
 // Parâmetro de entrada: Valor a ser escrito
 // Parâmetro de saída: não tem
-void Port_Output()
+void Port_Output(void)
 {
 		GPIO_PORTN_DATA_R ^= (0x2);
 }

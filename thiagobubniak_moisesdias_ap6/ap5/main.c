@@ -7,41 +7,44 @@
 #include <stdint.h>
 #include "tm4c1294ncpdt.h"
 
+void PLL_Init(void);
+void SysTick_Init(void);
+void SysTick_Wait1ms(uint32_t delay);
 void GPIO_Init(void);
+uint32_t PortJ_Input(void);
 void Port_Output(void);
+void Pisca_leds(void);
 void InterruptInit(void);
 void TimerInit(void);
-
-float dutycycle = 0.6;
-int ticksFor1ms = 1000;
-
+int ticksFor1ms = 40000;
 int main(void)
 {
+	PLL_Init();
+	SysTick_Init();
 	GPIO_Init();
 	InterruptInit();
 	TimerInit();
-	TIMER0_TAILR_R = ticksFor1ms / dutycycle;
+	TIMER2_TAILR_R = 40000;
+	ticksFor1ms = 80000;
+	TIMER2_CTL_R ^= (0x1);
 	
 	while (1)
 	{
-		
-	/*if(tem coisa pra ler)
-		{
-			// Desliga o timer
-			TIMER2_CTL_R = 0;
-				
-			// Reconfigura Load do Timer
-			TIMER0_TAILR_R = ticksFor1ms / dutycycle;
-				
-			// Liga o timer
-			TIMER2_CTL_R = 1;
-			
-			// Imprimir na saida o duty cycle atual
-			
-		}			*/
-		
+
 	}
 }
+
+//void GPIOPortJ_Handler(void) 
+//{
+//	GPIO_PORTJ_AHB_ICR_R |= 0x3;
+//	TIMER2_CTL_R ^= (0x1);
+//}
+
+
+
+
+
+
 
 void Timer2A_Handler(void)
 {
@@ -49,7 +52,7 @@ void Timer2A_Handler(void)
 	TIMER2_CTL_R = 0;
 	
 	// Reconfigura Load do Timer
-	TIMER0_TAILR_R = (ticksFor1ms - TIMER0_TAILR_R);
+	TIMER2_TAILR_R = (ticksFor1ms - TIMER2_TAILR_R);
 	
 	// Liga o timer
 	TIMER2_CTL_R = 1;
@@ -58,5 +61,4 @@ void Timer2A_Handler(void)
 	Port_Output();
 	TIMER2_ICR_R |= 0x1;
 }
-
 

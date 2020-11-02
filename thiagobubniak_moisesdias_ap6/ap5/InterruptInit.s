@@ -54,6 +54,24 @@ InterruptInit
 		STR R1, [R0]
 		
 		BX LR
-		
+
+;GPIOPortJ_Handler
+;			
+;		LDR R0, =0x40060414					; LENDO GPIORIS - GPIO_PORTJ_AHB_RIS_R
+;		LDR R1, [R0]
+;		ANDS R0, R1, #2_001					; LENDO SE A PORTA J0 TEVE INTERRUPT, SE NÃO, DA BRANCH
+;		
+;		PUSH{LR}
+;		BL Port_Output
+;		POP{LR}
+;		
+;		LDR R0, =0x4006041C					; LIMPANDO INTERRUPTS DAS PORTAS J0 E J1 - GPIO_PORTJ_AHB_ICR_R
+;		LDR R1, [R0]
+;		ORR R1, R1, #2_11
+;		MOV R1, #2_11
+;		STR R1, [R0]
+;		
+;		BX LR
+;		
 		ALIGN                        ;Garante que o fim da seção está alinhada 
 		END                          ;Fim do arquivo
