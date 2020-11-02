@@ -67,6 +67,11 @@ conferir
 		MOV R2, #2_1
 		ORR R1, R2, LSL #23
 		STR R1, [R0]
+		
+		LDR R0, =0x4003200C			; TIMER2_CTL_R
+		LDR R1, [R0]
+		ORR R1, #2_1
+		STR R1, [R0]
 
 		
 		
