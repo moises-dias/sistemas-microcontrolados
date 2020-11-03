@@ -17,7 +17,7 @@ void Pisca_leds(void);
 void InterruptInit(void);
 void TimerInit(void);
 
-int dutycycle = 50;
+float dutycycle = 50.0;
 int ticksFor1ms = 79999;
 
 void UARTinit()
@@ -30,10 +30,10 @@ void UARTinit()
 	UART0_IBRD_R = 260; // Configurando BaudRate de 19200
 	UART0_FBRD_R = 27;
 	
-	UART0_LCRH_R &= ~0b11111111;
-	UART0_LCRH_R |= 0b01110010; // 8-bits word lenght (6:5), FIFO Enable (4), Bit parity enable (1)
+	UART0_LCRH_R &= ~0xFF; //~0b11111111;
+	UART0_LCRH_R |= 0x72; //0b01110010; // 8-bits word lenght (6:5), FIFO Enable (4), Bit parity enable (1)
 	
-	UART0_CC_R &= ~0b1111; // Bit clear para setar clock como clock do processador
+	UART0_CC_R &= 0xF; //~0b1111; // Bit clear para setar clock como clock do processador
 	
 	UART0_CTL_R |= (1 << 9) & (1 << 8) & (1 << 0);  // Setar RXE, TXE e UARTEN
 	
@@ -64,7 +64,7 @@ int main(void)
 	
 	// Desliga, configura o load e liga
 	TIMER2_CTL_R &= ~(1 << 0); // BIT CLEAR
-	TIMER2_TAILR_R = ticksFor1ms * (dutycycle / 100);
+	TIMER2_TAILR_R = ticksFor1ms * (dutycycle / 100.0);
 	TIMER2_CTL_R |= (1 << 0); // BIT SET
 	
 	while (1)
