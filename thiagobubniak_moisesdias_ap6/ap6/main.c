@@ -52,7 +52,18 @@ void UARTinit()
 	GPIO_PORTA_AHB_DEN_R = 0x03; // Seta PA0 e PA1 como digitais
 	
 }
+// #define UART0_FR_R              (*((volatile uint32_t *)0x4000C018))
+// #define UART0_DR_R              (*((volatile uint32_t *)0x4000C000))
+char receive_char(void) {
+	while((UART0_FR_R & 0x10) == 1);
+	return UART0_DR_R & 0xFF;
+}
 
+void send_char(char c) {
+	while((UART0_FR_R & 0x20) == 1);
+	UART0_DR_R &= ~0xFF;
+	UART0_DR_R |= c;
+}
 
 int main(void)
 {
@@ -67,6 +78,9 @@ int main(void)
 	TIMER2_TAILR_R = ticksFor1ms * (dutycycle / 100.0);
 	TIMER2_CTL_R |= (1 << 0); // BIT SET
 	
+	
+	char test = 'a';
+	send_char(test);
 	while (1)
 	{
 			

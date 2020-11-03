@@ -2,7 +2,7 @@ Dependencies for Project 'exemplo', Target 'Target 1': (DO NOT MODIFY !)
 CompilerVersion: 5060750::V5.06 update 6 (build 750)::.\ARMCC
 F (.\startup.s)(0x5FA1D2EA)(--cpu Cortex-M4.fp.sp --pd "__EVAL SETA 1" -g --apcs=interwork -IC:\Users\moise\AppData\Local\Arm\Packs\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C129-ID:\KEIL\ARM\CMSIS\Include--pd "__UVISION_VERSION SETA 531" --pd "TM4C1294NCPDT SETA 1"--list .\listings\startup.lst --xref -o .\objects\startup.o --depend .\objects\startup.d)
 F (.\utils.s)(0x5FA1D2EA)(--cpu Cortex-M4.fp.sp --pd "__EVAL SETA 1" -g --apcs=interwork -IC:\Users\moise\AppData\Local\Arm\Packs\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C129-ID:\KEIL\ARM\CMSIS\Include--pd "__UVISION_VERSION SETA 531" --pd "TM4C1294NCPDT SETA 1"--list .\listings\utils.lst --xref -o .\objects\utils.o --depend .\objects\utils.d)
-F (.\main.c)(0x5FA1D78E)(--c99 -c --cpu Cortex-M4.fp.sp -D__EVAL -g -O0 --apcs=interwork --split_sections-IC:\Users\moise\AppData\Local\Arm\Packs\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C129-ID:\KEIL\ARM\CMSIS\Include-D__UVISION_VERSION="531" -DTM4C1294NCPDT-o .\objects\main.o --omf_browse .\objects\main.crf --depend .\objects\main.d)
+F (.\main.c)(0x5FA1E19F)(--c99 -c --cpu Cortex-M4.fp.sp -D__EVAL -g -O0 --apcs=interwork --split_sections-IC:\Users\moise\AppData\Local\Arm\Packs\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C129-ID:\KEIL\ARM\CMSIS\Include-D__UVISION_VERSION="531" -DTM4C1294NCPDT-o .\objects\main.o --omf_browse .\objects\main.crf --depend .\objects\main.d)
 I (D:\KEIL\ARM\ARMCC\include\stdint.h)(0x5EC810AC)
 I (tm4c1294ncpdt.h)(0x5FA1D2EA)
 F (.\tm4c1294ncpdt.h)(0x5FA1D2EA)()
