@@ -75,6 +75,10 @@ void Port_Output(void)
 		GPIO_PORTN_DATA_R ^= (0x2);
 }
 
+int get_status(void) {
+	return GPIO_PORTN_DATA_R & (0x2);
+}
+
 
 
 

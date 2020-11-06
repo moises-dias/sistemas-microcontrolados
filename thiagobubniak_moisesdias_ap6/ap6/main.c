@@ -16,8 +16,9 @@ void Port_Output(void);
 void Pisca_leds(void);
 void InterruptInit(void);
 void TimerInit(void);
+int get_status(void);
 
-float dutycycle = 50.0;
+float dutycycle = 1.0;
 int ticksFor1ms = 79999;
 
 void UARTinit()
@@ -31,17 +32,18 @@ void UARTinit()
 	UART0_FBRD_R = 27;
 	
 	UART0_LCRH_R &= ~0xFF; //~0b11111111;
-	UART0_LCRH_R |= 0x72; //0b01110010; // 8-bits word lenght (6:5), FIFO Enable (4), Bit parity enable (1)
+	
+	UART0_LCRH_R |= 0x70; //0b01110010; // 8-bits word lenght (6:5), FIFO Enable (4), Bit parity enable (1)
 	
 	UART0_CC_R &= 0xF; //~0b1111; // Bit clear para setar clock como clock do processador
 	
-	UART0_CTL_R |= (1 << 9) & (1 << 8) & (1 << 0);  // Setar RXE, TXE e UARTEN
+	UART0_CTL_R |= (1 << 9) | (1 << 8) | (1 << 0);  // Setar RXE, TXE e UARTEN
 	
 	
 	// Configurar GPIO PA0 e PA1 Pois são os pinos de read e send da UART
 	SYSCTL_RCGCGPIO_R |= (1 << 0); // Ligando clk para o GPIO Port A
 	
-	while(SYSCTL_PRGPIO_R & (1 << 0)); // Espera enquanto a UART Port A não fica pronto
+	while((SYSCTL_PRGPIO_R & (1 << 0) ) != (1 << 0) ){};
 	
 	GPIO_PORTA_AHB_AMSEL_R = 0x00; // Limpa o AMSEL para desabilitar modo analógico
 	
@@ -52,17 +54,23 @@ void UARTinit()
 	GPIO_PORTA_AHB_DEN_R = 0x03; // Seta PA0 e PA1 como digitais
 	
 }
-// #define UART0_FR_R              (*((volatile uint32_t *)0x4000C018))
-// #define UART0_DR_R              (*((volatile uint32_t *)0x4000C000))
-char receive_char(void) {
-	while((UART0_FR_R & 0x10) == 1);
-	return UART0_DR_R & 0xFF;
-}
 
 void send_char(char c) {
-	while((UART0_FR_R & 0x20) == 1);
-	UART0_DR_R &= ~0xFF;
-	UART0_DR_R |= c;
+	while((UART0_FR_R & 0x20) == 0x20) {}
+	UART0_DR_R = c;
+}
+
+void send_message(char * m, int size) {
+	char c;
+	for(int i = 0; i < size; i++) {
+		c = m[i];
+		send_char(c);
+	}
+}
+
+char receive_char(void) {
+	while((UART0_FR_R & 0x10) == 0x10) {}
+	return UART0_DR_R & 0xFF;
 }
 
 int main(void)
@@ -72,18 +80,42 @@ int main(void)
 	GPIO_Init();
 	InterruptInit();
 	TimerInit();
+	UARTinit();
 	
-	// Desliga, configura o load e liga
-	TIMER2_CTL_R &= ~(1 << 0); // BIT CLEAR
+	while(!get_status()) { }
 	TIMER2_TAILR_R = ticksFor1ms * (dutycycle / 100.0);
-	TIMER2_CTL_R |= (1 << 0); // BIT SET
-	
-	
-	char test = 'a';
-	send_char(test);
+	send_message("\r\nStart 1%", 10);
+	char c;
 	while (1)
 	{
-			
+		c = receive_char();
+		
+		if(c == '0') {
+			send_message("\r\nLED a 1%", 10);
+			dutycycle = 1;
+		}
+		else if(c == '1') {
+			send_message("\r\nLED a 20%", 11);
+			dutycycle = 20;
+		}
+		else if(c == '2') {
+			send_message("\r\nLED a 40%", 11);
+			dutycycle = 40;
+		}
+		else if(c == '3') {
+			send_message("\r\nLED a 60%", 11);
+			dutycycle = 60;
+		}
+		else if(c == '4') {
+			send_message("\r\nLED a 80%", 11);
+			dutycycle = 80;
+		}
+		else if(c == '5') {
+			send_message("\r\nLED a 99%", 11);
+			dutycycle = 99;
+		}
+		while(!get_status()) { }
+		TIMER2_TAILR_R = ticksFor1ms * (dutycycle / 100.0);
 	}
 }
 

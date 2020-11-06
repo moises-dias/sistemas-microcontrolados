@@ -21,24 +21,26 @@ Target DLL:      lmidk-agdi.dll V???
 Dialog DLL:      TCM.DLL V1.46.0.0
  
 <h2>Project:</h2>
-D:\DOWNLOADS\ESTUDO\MICRO\sistemas-microcontrolados\thiagobubniak_moisesdias_ap6\ap6\exemplo.uvprojx
+D:\DOWNLOADS\ap6\ap6\exemplo.uvprojx
 Project File Date:  11/03/2020
 
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 6 (build 750)', folder: 'D:\KEIL\ARM\ARMCC\Bin'
 Rebuild target 'Target 1'
 assembling InterruptInit.s...
-assembling TimerInit.s...
 assembling utils.s...
+assembling TimerInit.s...
 assembling startup.s...
-compiling main.c...
-main.c(78): warning:  #1035-D: single-precision operand implicitly converted to double-precision
-  	TIMER2_TAILR_R = ticksFor1ms * (dutycycle / 100.0);
-main.c: 1 warning, 0 errors
 compiling gpio.c...
+compiling main.c...
+main.c(94): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  	TIMER2_TAILR_R = ticksFor1ms * (dutycycle / 100.0);
+main.c(127): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  		TIMER2_TAILR_R = ticksFor1ms * (dutycycle / 100.0);
+main.c: 2 warnings, 0 errors
 linking...
-Program Size: Code=3652 RO-data=32 RW-data=8 ZI-data=1120  
-".\Objects\exemplo.axf" - 0 Error(s), 1 Warning(s).
+Program Size: Code=4188 RO-data=32 RW-data=8 ZI-data=1120  
+".\Objects\exemplo.axf" - 0 Error(s), 2 Warning(s).
 
 <h2>Software Packages used:</h2>
 
